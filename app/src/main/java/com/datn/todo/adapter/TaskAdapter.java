@@ -226,6 +226,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TaskViewHolder(@NonNull View view) {
             super(view);
             ButterKnife.bind(this, view);
+            day = view.findViewById(R.id.day);
+            date = view.findViewById(R.id.date);
+            month = view.findViewById(R.id.month);
+            title = view.findViewById(R.id.title);
+            description = view.findViewById(R.id.description);
+            status = view.findViewById(R.id.status);
+            options = view.findViewById(R.id.options);
+            time = view.findViewById(R.id.time);
         }
     }
 
