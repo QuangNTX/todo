@@ -72,6 +72,7 @@
             android:layout_height="96dp"
             android:gravity="top"
             tools:text="abc\ndefghijkl"
+            android:inputType="text"
             android:layout_marginTop="5dp"
             android:background="@drawable/btn_border"
             android:padding="10dp"
@@ -134,7 +135,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/addTask"
             style="@style/CommonButton"
             android:layout_width="match_parent"

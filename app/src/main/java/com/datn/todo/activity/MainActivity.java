@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -22,7 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.datn.todo.R;
@@ -41,18 +40,19 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity implements CreateTaskBottomSheetFragment.setRefreshListener {
+public class MainActivity extends BaseActivity
+        implements CreateTaskBottomSheetFragment.setRefreshListener, TaskAdapter.OnTaskItemClickListener {
 
     RecyclerView taskRecycler;
     TaskAdapter taskAdapter;
     List<Task> tasks = new ArrayList<>();
-    ImageView calendar;
+    ImageView buttonSort;
     FloatingActionButton buttonVoice;
     FloatingActionButton buttonAdd;
     FloatingActionButton buttonKeyBoard;
+    SearchView searchView;
 
     LinearLayout emptyState;
 
@@ -64,11 +64,12 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        calendar = findViewById(R.id.buttonSort);
+        buttonSort = findViewById(R.id.buttonSort);
         buttonVoice = findViewById(R.id.buttonVoice);
         buttonAdd = findViewById(R.id.buttonAdd);
         buttonKeyBoard = findViewById(R.id.buttonKeyBoard);
         emptyState = findViewById(R.id.emptyState);
+        searchView = findViewById(R.id.searchView);
 
         setUpAdapter();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -109,9 +110,22 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
 
         getSavedTasks();
 
-        calendar.setOnClickListener(view -> {
-            ShowCalendarViewBottomSheet showCalendarViewBottomSheet = new ShowCalendarViewBottomSheet();
-            showCalendarViewBottomSheet.show(getSupportFragmentManager(), showCalendarViewBottomSheet.getTag());
+        buttonSort.setOnClickListener(view -> {
+//            ShowCalendarViewBottomSheet showCalendarViewBottomSheet = new ShowCalendarViewBottomSheet();
+//            showCalendarViewBottomSheet.show(getSupportFragmentManager(), showCalendarViewBottomSheet.getTag());
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                taskAdapter.getFilter().filter(newText);
+                return false;
+            }
         });
     }
 
@@ -137,7 +151,7 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
 
                 String[] timeAndDate = ToDoExtractor.INSTANCE.extractVietnameseTimeAndDate(todo).split("/");
                 task.setDate(timeAndDate[1]);
-                task.setLastAlarm(timeAndDate[0]);
+                task.setTime(timeAndDate[0]);
 
                 createTask(task);
             } else if (ToDoExtractor.INSTANCE.extractTimeAndDate(todo) != null) {
@@ -146,7 +160,7 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
 
                 String[] timeAndDate = ToDoExtractor.INSTANCE.extractTimeAndDate(todo).split("/");
                 task.setDate(timeAndDate[1]);
-                task.setLastAlarm(timeAndDate[0]);
+                task.setTime(timeAndDate[0]);
 
                 createTask(task);
             } else {
@@ -171,7 +185,7 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
 
     public void setUpAdapter() {
         taskAdapter = new TaskAdapter(this, tasks, this);
-        Log.e("TAG", "setUpAdapter: " + taskAdapter == null ? "yes" : "no");
+        taskAdapter.setOnTaskItemClickListener(this);
         taskRecycler = findViewById(R.id.taskRecycler);
         taskRecycler.setAdapter(taskAdapter);
     }
@@ -239,7 +253,7 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
             String month = items1[1];
             String year = items1[2];
 
-            String[] itemTime = task.getLastAlarm().split(":");
+            String[] itemTime = task.getTime().split(":");
             String hour = itemTime[0];
             String min = itemTime[1];
 
@@ -257,7 +271,7 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
             alarmIntent.putExtra("TITLE", task.getTaskTitle());
             alarmIntent.putExtra("DESC", task.getTaskDescrption());
             alarmIntent.putExtra("DATE", task.getDate());
-            alarmIntent.putExtra("TIME", task.getLastAlarm());
+            alarmIntent.putExtra("TIME", task.getTime());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, CreateTaskBottomSheetFragment.count, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -273,5 +287,15 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onTaskItemClick(Task task) {
+        Intent intent = new Intent(this, DetailTaskActivity.class);
+        intent.putExtra("TITLE", task.getTaskTitle());
+        intent.putExtra("DESC", task.getTaskDescrption());
+        intent.putExtra("DATE", task.getDate());
+        intent.putExtra("TIME", task.getTime());
+        startActivity(intent);
     }
 }

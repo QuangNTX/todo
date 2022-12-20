@@ -20,15 +20,15 @@ import butterknife.ButterKnife;
 
 public class AlarmActivity extends BaseActivity {
 
-    @BindView(R.id.imageView)
+//    @BindView(R.id.imageView)
     ImageView imageView;
-    @BindView(R.id.title)
+//    @BindView(R.id.title)
     TextView title;
-    @BindView(R.id.description)
+//    @BindView(R.id.description)
     TextView description;
-    @BindView(R.id.timeAndData)
+//    @BindView(R.id.timeAndData)
     TextView timeAndData;
-    @BindView(R.id.closeButton)
+//    @BindView(R.id.closeButton)
     Button closeButton;
     MediaPlayer mediaPlayer;
 
@@ -37,6 +37,12 @@ public class AlarmActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
         ButterKnife.bind(this);
+
+        imageView = findViewById(R.id.imageView);
+        title = findViewById(R.id.title);
+        description = findViewById(R.id.description);
+        timeAndData = findViewById(R.id.timeAndData);
+        closeButton = findViewById(R.id.closeButton);
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.notification);
         mediaPlayer.start();

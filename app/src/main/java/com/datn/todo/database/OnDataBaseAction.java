@@ -24,10 +24,10 @@ public interface OnDataBaseAction {
     Task selectDataFromAnId(int taskId);
 
     @Query("UPDATE Task SET taskTitle = :taskTitle, taskDescription = :taskDescription, date = :taskDate, " +
-            "lastAlarm = :taskTime, isComplete = :isComplete WHERE taskId = :taskId")
+            "time = :taskTime, isComplete = :isComplete WHERE taskId = :taskId")
     void updateAnExistingRow(int taskId, String taskTitle, String taskDescription, String taskDate, String taskTime, Boolean isComplete);
 
     @Query("SELECT * FROM Task WHERE taskTitle = :taskTitle AND taskDescription = :taskDescription AND date = :taskDate AND " +
-            "lastAlarm = :taskTime")
+            "time = :taskTime")
     Task getTask(String taskTitle, String taskDescription, String taskDate, String taskTime);
 }

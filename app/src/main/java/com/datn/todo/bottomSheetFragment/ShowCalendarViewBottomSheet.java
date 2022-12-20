@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.applandeo.materialcalendarview.CalendarView;
@@ -33,11 +35,10 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
 
     Unbinder unbinder;
     MainActivity activity;
-    @BindView(R.id.back)
     ImageView back;
-    @BindView(R.id.calendarView)
     CalendarView calendarView;
     List<Task> tasks = new ArrayList<>();
+    Dialog dialog;
 
 
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
@@ -62,8 +63,16 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
         View contentView = View.inflate(getContext(), R.layout.fragment_calendar_view, null);
         unbinder = ButterKnife.bind(this, contentView);
         dialog.setContentView(contentView);
+        this.dialog = dialog;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view_, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view_, savedInstanceState);
+        calendarView = view_.findViewById(R.id.calendarView);
         calendarView.setHeaderColor(R.color.colorAccent);
         getSavedTasks();
+        back = view_.findViewById(R.id.back);
         back.setOnClickListener(view -> dialog.dismiss());
     }
 
@@ -99,7 +108,7 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
     public List<EventDay> getHighlitedDays() {
         List<EventDay> events = new ArrayList<>();
 
-        for(int i = 0; i < tasks.size(); i++) {
+        for (int i = 0; i < tasks.size(); i++) {
             Calendar calendar = Calendar.getInstance();
             String[] items1 = tasks.get(i).getDate().split("-");
             String dd = items1[0];

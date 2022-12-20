@@ -16,7 +16,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_gravity="center"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/bg_dialog"
         android:orientation="vertical">
 
     <ImageView
@@ -51,7 +51,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:id="@+id/closeButton"
             android:textSize="14sp"
             android:layout_marginLeft="30dp"
@@ -59,7 +59,7 @@
             android:layout_marginTop="50dp"
             android:background="@drawable/btn_background"
             android:textColor="@color/colorPrimary"
-            android:text="Done"
+            android:text="DONE"
             android:layout_marginBottom="30dp"
             android:textAllCaps="false"/>
 
