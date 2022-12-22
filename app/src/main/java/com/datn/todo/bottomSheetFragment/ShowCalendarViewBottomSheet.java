@@ -20,20 +20,14 @@ import com.datn.todo.database.DatabaseClient;
 import com.datn.todo.model.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.drawable.DrawableUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
 
-    Unbinder unbinder;
     MainActivity activity;
     ImageView back;
     CalendarView calendarView;
@@ -61,7 +55,6 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.fragment_calendar_view, null);
-        unbinder = ButterKnife.bind(this, contentView);
         dialog.setContentView(contentView);
         this.dialog = dialog;
     }

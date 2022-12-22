@@ -34,12 +34,8 @@ import com.google.android.material.button.MaterialButton;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
 
-    Unbinder unbinder;
     EditText addTaskTitle;
     EditText addTaskDescription;
     EditText taskDate;
@@ -70,7 +66,6 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.fragment_create_task, null);
-        unbinder = ButterKnife.bind(this, contentView);
         dialog.setContentView(contentView);
         alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
 

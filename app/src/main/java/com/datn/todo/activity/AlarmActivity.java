@@ -15,9 +15,6 @@ import com.datn.todo.model.Task;
 
 import java.util.concurrent.Executors;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class AlarmActivity extends BaseActivity {
 
     ImageView imageView;
@@ -31,7 +28,6 @@ public class AlarmActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
-        ButterKnife.bind(this);
 
         imageView = findViewById(R.id.imageView);
         title = findViewById(R.id.title);

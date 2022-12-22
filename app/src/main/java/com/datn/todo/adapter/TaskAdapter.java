@@ -1,6 +1,5 @@
 package com.datn.todo.adapter;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -29,9 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> implements Filterable {
 
@@ -70,44 +66,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        Task task = taskList.get(position);
-        holder.title.setText(task.getTaskTitle());
-        holder.description.setText(task.getTaskDescrption());
-        holder.time.setText(task.getTime());
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onTaskItemClickListener.onTaskItemClick(task);
-            }
-        });
-
-        if (task.isComplete()) {
-            holder.status.setText("Completed");
-            holder.status.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));
-        } else {
-            holder.status.setText("Upcoming");
-            holder.status.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
-
-        }
-        holder.options.setOnClickListener(view -> showPopUpMenu(view, position));
-
-        try {
-            date = inputDateFormat.parse(task.getDate());
-            outputDateString = dateFormat.format(date);
-
-            String[] items1 = outputDateString.split(" ");
-            String day = items1[0];
-            String dd = items1[1];
-            String month = items1[2];
-
-            holder.day.setText(day);
-            holder.date.setText(dd);
-            holder.month.setText(month);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        holder.bindView(taskList.get(position), position);
     }
 
     public void showPopUpMenu(View view, int position) {
@@ -263,34 +222,65 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     public class TaskViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.day)
-        TextView day;
-        @BindView(R.id.date)
-        TextView date;
-        @BindView(R.id.month)
-        TextView month;
-        @BindView(R.id.title)
-        TextView title;
-        @BindView(R.id.description)
-        TextView description;
-        @BindView(R.id.status)
-        TextView status;
-        @BindView(R.id.options)
-        ImageView options;
-        @BindView(R.id.time)
-        TextView time;
+        private TextView _day;
+        private TextView _date;
+        private TextView _month;
+        private TextView _title;
+        private TextView _description;
+        private TextView _status;
+        private ImageView _options;
+        private TextView _time;
 
         TaskViewHolder(@NonNull View view) {
             super(view);
-            ButterKnife.bind(this, view);
-            day = view.findViewById(R.id.day);
-            date = view.findViewById(R.id.date);
-            month = view.findViewById(R.id.month);
-            title = view.findViewById(R.id.title);
-            description = view.findViewById(R.id.description);
-            status = view.findViewById(R.id.status);
-            options = view.findViewById(R.id.options);
-            time = view.findViewById(R.id.time);
+            _day = view.findViewById(R.id.day);
+            _date = view.findViewById(R.id.date);
+            _month = view.findViewById(R.id.month);
+            _title = view.findViewById(R.id.title);
+            _description = view.findViewById(R.id.description);
+            _status = view.findViewById(R.id.status);
+            _options = view.findViewById(R.id.options);
+            _time = view.findViewById(R.id.time);
+        }
+
+        public void bindView(Task task, int position){
+            _title.setText(task.getTaskTitle());
+            _description.setText(task.getTaskDescrption());
+            _time.setText(task.getTime());
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onTaskItemClickListener.onTaskItemClick(task);
+                }
+            });
+
+            if (task.isComplete()) {
+                _status.setText("Completed");
+                _status.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));
+            } else {
+                _status.setText("Upcoming");
+                _status.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
+
+            }
+            _options.setOnClickListener(view -> showPopUpMenu(view, position));
+
+            try {
+                date = inputDateFormat.parse(task.getDate());
+                outputDateString = dateFormat.format(date);
+
+                String[] items1 = outputDateString.split(" ");
+                String day = items1[0];
+                String dd = items1[1];
+                String month = items1[2];
+
+                _day.setText(day);
+                _date.setText(dd);
+                _month.setText(month);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
