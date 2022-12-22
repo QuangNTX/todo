@@ -34,22 +34,16 @@ import com.google.android.material.button.MaterialButton;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
 
     Unbinder unbinder;
-    //    @BindView(R.id.addTaskTitle)
     EditText addTaskTitle;
-    //    @BindView(R.id.addTaskDescription)
     EditText addTaskDescription;
-    //    @BindView(R.id.taskDate)
     EditText taskDate;
-    //    @BindView(R.id.taskTime)
     EditText taskTime;
-    //    @BindView(R.id.addTask)
     Button addTask;
     int taskId;
     boolean isEdit;
@@ -80,17 +74,26 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
         dialog.setContentView(contentView);
         alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
 
-    }
+        taskTime = dialog.findViewById(R.id.taskTime);
+        taskTime.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                // Get Current Time
+                final Calendar c = Calendar.getInstance();
+                mHour = c.get(Calendar.HOUR_OF_DAY);
+                mMinute = c.get(Calendar.MINUTE);
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public void onViewCreated(@NonNull View view_, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view_, savedInstanceState);
-        addTask = view_.findViewById(R.id.addTask);
-        addTask.setOnClickListener(view -> {
-            if (validateFields()) createTask();
+                // Launch Time Picker Dialog
+                timePickerDialog = new TimePickerDialog(getActivity(),
+                        (view12, hourOfDay, minute) -> {
+                            taskTime.setText(hourOfDay + ":" + minute);
+                            timePickerDialog.dismiss();
+                        }, mHour, mMinute, false);
+                timePickerDialog.show();
+            }
+            return true;
         });
-        taskDate = view_.findViewById(R.id.taskDate);
+
+        taskDate = dialog.findViewById(R.id.taskDate);
         taskDate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 final Calendar c = Calendar.getInstance();
@@ -106,28 +109,21 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
             }
             return true;
         });
-        taskTime = view_.findViewById(R.id.taskTime);
-        taskTime.setOnTouchListener((view, motionEvent) -> {
-            Log.e("TAG::", "onViewCreated: " );
-            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                // Get Current Time
-                final Calendar c = Calendar.getInstance();
-                mHour = c.get(Calendar.HOUR_OF_DAY);
-                mMinute = c.get(Calendar.MINUTE);
 
-                // Launch Time Picker Dialog
-                timePickerDialog = new TimePickerDialog(getActivity(),
-                        (view12, hourOfDay, minute) -> {
-                            taskTime.setText(hourOfDay + ":" + minute);
-                            timePickerDialog.dismiss();
-                        }, mHour, mMinute, false);
-                timePickerDialog.show();
-                Log.e("TAG::", "onViewCreated: TIME PICKER" );
-            }
-            return true;
+        addTask = dialog.findViewById(R.id.addTask);
+        addTask.setOnClickListener(view -> {
+            if (validateFields()) createTask();
         });
-        addTaskDescription = view_.findViewById(R.id.addTaskDescription);
-        addTaskTitle = view_.findViewById(R.id.addTaskTitle);
+
+        addTaskDescription = dialog.findViewById(R.id.addTaskDescription);
+        addTaskTitle = dialog.findViewById(R.id.addTaskTitle);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onViewCreated(@NonNull View view_, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view_, savedInstanceState);
+
         if (isEdit) {
             showTaskFromId();
         }
@@ -157,7 +153,7 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     private void createTask() {
-       class saveTaskInBackend extends AsyncTask<Void, Void, Void> {
+        class saveTaskInBackend extends AsyncTask<Void, Void, Void> {
             @SuppressLint("WrongThread")
             @Override
             protected Void doInBackground(Void... voids) {
@@ -165,7 +161,7 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
                 createTask.setTaskTitle(addTaskTitle.getText().toString());
                 createTask.setTaskDescrption(addTaskDescription.getText().toString());
                 createTask.setDate(taskDate.getText().toString());
-                createTask.setLastAlarm(taskTime.getText().toString());
+                createTask.setTime(taskTime.getText().toString());
 
                 if (!isEdit)
                     DatabaseClient.getInstance(getActivity()).getAppDatabase().dataBaseAction().insertDataIntoTaskList(createTask);
@@ -257,7 +253,7 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
         addTaskTitle.setText(task.getTaskTitle());
         addTaskDescription.setText(task.getTaskDescrption());
         taskDate.setText(task.getDate());
-        taskTime.setText(task.getLastAlarm());
+        taskTime.setText(task.getTime());
     }
 
     public interface setRefreshListener {

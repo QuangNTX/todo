@@ -19,8 +19,8 @@ public class Task implements Serializable {
     String taskDescrption;
     @ColumnInfo(name = "isComplete")
     boolean isComplete;
-    @ColumnInfo(name = "lastAlarm")
-    String lastAlarm;
+    @ColumnInfo(name = "time")
+    String time;
 
     public Task() {
 
@@ -34,12 +34,12 @@ public class Task implements Serializable {
         isComplete = complete;
     }
 
-    public String getLastAlarm() {
-        return lastAlarm;
+    public String getTime() {
+        return time;
     }
 
-    public void setLastAlarm(String lastAlarm) {
-        this.lastAlarm = lastAlarm;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public int getTaskId() {

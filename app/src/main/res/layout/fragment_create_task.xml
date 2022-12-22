@@ -72,6 +72,7 @@
             android:layout_height="96dp"
             android:gravity="top"
             tools:text="abc\ndefghijkl"
+            android:inputType="text"
             android:layout_marginTop="5dp"
             android:background="@drawable/btn_border"
             android:padding="10dp"

@@ -20,15 +20,10 @@ import butterknife.ButterKnife;
 
 public class AlarmActivity extends BaseActivity {
 
-//    @BindView(R.id.imageView)
     ImageView imageView;
-//    @BindView(R.id.title)
     TextView title;
-//    @BindView(R.id.description)
     TextView description;
-//    @BindView(R.id.timeAndData)
     TextView timeAndData;
-//    @BindView(R.id.closeButton)
     Button closeButton;
     MediaPlayer mediaPlayer;
 
