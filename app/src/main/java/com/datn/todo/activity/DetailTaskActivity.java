@@ -43,8 +43,8 @@ public class DetailTaskActivity extends AppCompatActivity {
 
         time.setText(task.getTime());
         date.setText(task.getDate());
-        title.setText(task.getTaskTitle());
-        description.setText(task.getTaskDescrption());
+        title.setText(task.getTaskDescrption());
+        description.setText(task.getTaskTitle());
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

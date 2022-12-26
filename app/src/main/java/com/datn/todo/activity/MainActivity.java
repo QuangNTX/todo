@@ -40,8 +40,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-import butterknife.ButterKnife;
-
 public class MainActivity extends BaseActivity
         implements CreateTaskBottomSheetFragment.setRefreshListener, TaskAdapter.OnTaskItemClickListener {
 
@@ -63,7 +61,6 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
         buttonSort = findViewById(R.id.buttonSort);
         buttonVoice = findViewById(R.id.buttonVoice);
         buttonAdd = findViewById(R.id.buttonAdd);
@@ -93,6 +90,7 @@ public class MainActivity extends BaseActivity
             CreateTaskBottomSheetFragment createTaskBottomSheetFragment = new CreateTaskBottomSheetFragment();
             createTaskBottomSheetFragment.setTaskId(0, false, this, MainActivity.this);
             createTaskBottomSheetFragment.show(getSupportFragmentManager(), createTaskBottomSheetFragment.getTag());
+            handleVisibilityChildButtons(false);
         });
         buttonVoice.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -106,6 +104,7 @@ public class MainActivity extends BaseActivity
                 Toast.makeText(getApplicationContext(), "Speech input isn't supported!",
                         Toast.LENGTH_SHORT).show();
             }
+            handleVisibilityChildButtons(false);
         });
 
         getSavedTasks();
@@ -178,6 +177,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private void handleVisibilityChildButtons(Boolean visibility) {
         buttonVoice.setVisibility(visibility ? View.VISIBLE : View.GONE);
         buttonKeyBoard.setVisibility(visibility ? View.VISIBLE : View.GONE);
@@ -238,7 +238,7 @@ public class MainActivity extends BaseActivity
                     createAnAlarm(task);
                 }
                 getSavedTasks();
-                Toast.makeText(MainActivity.this, "Your event is been added", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.event_has_been_added_text, Toast.LENGTH_SHORT).show();
             }
         }
         saveTaskInBackend st = new saveTaskInBackend();
