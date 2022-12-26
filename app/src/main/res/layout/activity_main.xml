@@ -32,11 +32,11 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/buttonSort"
+            android:id="@+id/buttonQuestion"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="right|center"
-            android:background="@drawable/ic_sort" />
+            android:background="@drawable/ic_message_question" />
 
     </FrameLayout>
 

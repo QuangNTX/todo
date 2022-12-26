@@ -1,5 +1,6 @@
 package com.datn.todo.activity;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,16 +51,22 @@ public class AlarmActivity extends BaseActivity {
             Executors.newSingleThreadExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
-                    Task task = DatabaseClient.getInstance(getBaseContext())
-                            .getAppDatabase().dataBaseAction()
-                            .getTask(extraTitle, extraDesc, extraDate, extraTime);
+                    Task task = DatabaseClient.getInstance(getBaseContext()).getAppDatabase().dataBaseAction().getTask(extraTitle, extraDesc, extraDate, extraTime);
 
-                    DatabaseClient.getInstance(getBaseContext())
-                            .getAppDatabase().dataBaseAction()
-                            .updateAnExistingRow(task.getTaskId(), extraTitle, extraDesc, extraDate, extraTime, true);
+                    DatabaseClient.getInstance(getBaseContext()).getAppDatabase().dataBaseAction().updateAnExistingRow(task.getTaskId(), extraTitle, extraDesc, extraDate, extraTime, true);
 
                 }
             });
+
+            if (title.toString().toLowerCase().contains("mở youtube") || description.toString().toLowerCase().contains("mở youtube")) {
+                try {
+                    Intent i = this.getPackageManager().getLaunchIntentForPackage("com.google.android.youtube");
+                    startActivity(i);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
 
         Glide.with(getApplicationContext()).load(R.drawable.alert).into(imageView);

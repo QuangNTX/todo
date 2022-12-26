@@ -3,14 +3,21 @@ package com.datn.todo.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.datn.todo.R;
+import com.datn.todo.database.DatabaseClient;
 import com.datn.todo.model.Task;
+
+import java.util.List;
 
 public class DetailTaskActivity extends AppCompatActivity {
 
@@ -52,7 +59,6 @@ public class DetailTaskActivity extends AppCompatActivity {
             }
         });
 
-        buttonMore.setVisibility(View.GONE);
         buttonMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,29 +68,87 @@ public class DetailTaskActivity extends AppCompatActivity {
     }
 
     private void showPopUpMenu(View view, Task task) {
-//        Context context = view.getContext();
-//        PopupMenu popupMenu = new PopupMenu(context, view);
-//        popupMenu.getMenuInflater().inflate(R.menu.menu, popupMenu.getMenu());
-//        popupMenu.setOnMenuItemClickListener(item -> {
-//            switch (item.getItemId()) {
-//                case R.id.menuDelete:
-//                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-//                    alertDialogBuilder.setTitle(R.string.delete_confirmation).setMessage(R.string.sureToDelete).setPositiveButton(R.string.yes, (dialog, which) -> {
-//                        deleteTaskFromId(task.getTaskId(), position);
-//                    }).setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel()).show();
-//                    break;
-//                case R.id.menuUpdate:
-//                    CreateTaskBottomSheetFragment createTaskBottomSheetFragment = new CreateTaskBottomSheetFragment();
-//                    createTaskBottomSheetFragment.setTaskId(task.getTaskId(), true, context, context);
-//                    createTaskBottomSheetFragment.show(getSupportFragmentManager(), createTaskBottomSheetFragment.getTag());
-//                    break;
-//                case R.id.menuComplete:
-//                    AlertDialog.Builder completeAlertDialog = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-//                    completeAlertDialog.setTitle(R.string.confirmation).setMessage(R.string.sureToMarkAsComplete).setPositiveButton(R.string.yes, (dialog, which) -> showCompleteDialog(task, position)).setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel()).show();
-//                    break;
-//            }
-//            return false;
-//        });
-//        popupMenu.show();
+        Context context = view.getContext();
+        PopupMenu popupMenu = new PopupMenu(context, view);
+        popupMenu.getMenuInflater().inflate(R.menu.menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menuDelete:
+                    deleteTask(this, task);
+                    break;
+                case R.id.menuUpdate:
+                    updateTask(this, task);
+                    break;
+                case R.id.menuComplete:
+                    completeTask(this, task);
+                    break;
+            }
+            return false;
+        });
+        popupMenu.show();
+    }
+
+    /***
+     *  Function delete, update, complete dont work
+     */
+
+    private void deleteTask(Context context, Task task) {
+        class DeleteTasks extends AsyncTask<Void, Void, Void> {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DatabaseClient.getInstance(context).getAppDatabase().dataBaseAction().deleteTaskFromId(task.getTaskId());
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void unused) {
+                super.onPostExecute(unused);
+                finishActivity();
+            }
+        }
+        DeleteTasks deleteTasks = new DeleteTasks();
+        deleteTasks.execute();
+    }
+
+    private void updateTask(Context context, Task task) {
+        class UpdateTasks extends AsyncTask<Void, Void, Void> {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DatabaseClient.getInstance(context).getAppDatabase().dataBaseAction().updateAnExistingRow(task.getTaskId(), task.getTaskTitle(), description.getText().toString(), date.getText().toString(), time.getText().toString(), task.isComplete());
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void unused) {
+                super.onPostExecute(unused);
+                finishActivity();
+            }
+        }
+        UpdateTasks updateTask = new UpdateTasks();
+        updateTask.execute();
+    }
+
+    private void completeTask(Context context, Task task) {
+        class CompleteTasks extends AsyncTask<Void, Void, Void> {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DatabaseClient.getInstance(context).getAppDatabase().dataBaseAction().updateAnExistingRow(task.getTaskId(), task.getTaskTitle(), task.getTaskDescrption(), task.getDate(), task.getTime(), true);
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void unused) {
+                super.onPostExecute(unused);
+                finishActivity();
+            }
+        }
+        CompleteTasks completeTask = new CompleteTasks();
+        completeTask.execute();
+    }
+
+    void finishActivity() {
+//        this.finish()
+        startActivity(new Intent(this, MainActivity.class));
     }
 }

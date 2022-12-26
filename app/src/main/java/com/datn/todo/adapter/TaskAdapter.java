@@ -94,7 +94,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     public void showCompleteDialog(Task task, int position) {
         Dialog dialog = new Dialog(context, R.style.AppTheme);
-        dialog.setContentView(R.layout.dialog_completed_theme);
+        dialog.setContentView(R.layout.dialog_completed);
         Button close = dialog.findViewById(R.id.closeButton);
         close.setOnClickListener(view -> {
             updateTaskFromId(task, position);
@@ -140,7 +140,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         class GetSavedTasks extends AsyncTask<Void, Void, List<Task>> {
             @Override
             protected List<Task> doInBackground(Void... voids) {
-                DatabaseClient.getInstance(context).getAppDatabase().dataBaseAction().updateAnExistingRow(task.getTaskId(), task.getTaskTitle(), task.getTaskDescrption(), task.getDate(), task.getTime(), true);
+                DatabaseClient.getInstance(context).getAppDatabase().dataBaseAction()
+                        .updateAnExistingRow(task.getTaskId(), task.getTaskTitle(), task.getTaskDescrption(), task.getDate(), task.getTime(), true);
 
                 return taskList;
             }

@@ -3,25 +3,31 @@ package com.datn.todo.activity;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.datn.todo.R;
@@ -40,13 +46,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends BaseActivity
-        implements CreateTaskBottomSheetFragment.setRefreshListener, TaskAdapter.OnTaskItemClickListener {
+public class MainActivity extends BaseActivity implements CreateTaskBottomSheetFragment.setRefreshListener, TaskAdapter.OnTaskItemClickListener {
 
     RecyclerView taskRecycler;
     TaskAdapter taskAdapter;
     List<Task> tasks = new ArrayList<>();
-    ImageView buttonSort;
+    ImageView buttonQuestion;
     FloatingActionButton buttonVoice;
     FloatingActionButton buttonAdd;
     FloatingActionButton buttonKeyBoard;
@@ -61,12 +66,15 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buttonSort = findViewById(R.id.buttonSort);
+        buttonQuestion = findViewById(R.id.buttonQuestion);
         buttonVoice = findViewById(R.id.buttonVoice);
         buttonAdd = findViewById(R.id.buttonAdd);
         buttonKeyBoard = findViewById(R.id.buttonKeyBoard);
         emptyState = findViewById(R.id.emptyState);
         searchView = findViewById(R.id.searchView);
+
+        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(true);
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.white));
 
         setUpAdapter();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -79,11 +87,7 @@ public class MainActivity extends BaseActivity
         buttonAdd.setOnClickListener(view -> {
             isButtonOpening = !isButtonOpening;
             handleVisibilityChildButtons(isButtonOpening);
-            if (isButtonOpening) {
-                buttonAdd.setRotation(45f);
-            } else {
-                buttonAdd.setRotation(0f);
-            }
+
         });
 
         buttonKeyBoard.setOnClickListener(view -> {
@@ -94,24 +98,21 @@ public class MainActivity extends BaseActivity
         });
         buttonVoice.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech your task...");
             try {
                 startActivityForResult(intent, 7899);
             } catch (ActivityNotFoundException a) {
-                Toast.makeText(getApplicationContext(), "Speech input isn't supported!",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Speech input isn't supported!", Toast.LENGTH_SHORT).show();
             }
             handleVisibilityChildButtons(false);
         });
 
         getSavedTasks();
 
-        buttonSort.setOnClickListener(view -> {
-//            ShowCalendarViewBottomSheet showCalendarViewBottomSheet = new ShowCalendarViewBottomSheet();
-//            showCalendarViewBottomSheet.show(getSupportFragmentManager(), showCalendarViewBottomSheet.getTag());
+        buttonQuestion.setOnClickListener(view -> {
+            showQuestionMessageDialog();
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -129,6 +130,42 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    private void showQuestionMessageDialog() {
+        Dialog dialog = new Dialog(this, R.style.AppTheme);
+        dialog.setContentView(R.layout.layout_question_message);
+
+        Button buttonDelete = dialog.findViewById(R.id.closeButton);
+        buttonDelete.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    private void showIncorrectFormNotification() {
+        Dialog dialog = new Dialog(this, R.style.AppTheme);
+        dialog.setContentView(R.layout.layout_incorrect_form);
+
+        Button buttonHowToUse = dialog.findViewById(R.id.buttonHowToUse);
+        buttonHowToUse.setOnClickListener(view -> {
+            showQuestionMessageDialog();
+            dialog.dismiss();
+        });
+
+        TextView buttonCancel = dialog.findViewById(R.id.buttonCancel);
+        buttonCancel.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         taskAdapter.notifyDataSetChanged();
@@ -138,8 +175,7 @@ public class MainActivity extends BaseActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 7899 && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> result = data
-                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
             Task task = new Task();
             if (result == null) return;
@@ -162,17 +198,17 @@ public class MainActivity extends BaseActivity
                 task.setTime(timeAndDate[0]);
 
                 createTask(task);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && ToDoExtractor.INSTANCE.extractVietnameseTimeAndDateSecondFilter(todo) != null) {
+                task.setTaskTitle("To Do");
+                task.setTaskDescrption(ToDoExtractor.INSTANCE.extractVietnameseDesc(todo));
+
+                String[] timeAndDate = ToDoExtractor.INSTANCE.extractVietnameseTimeAndDateSecondFilter(todo).split("/");
+                task.setDate(timeAndDate[1]);
+                task.setTime(timeAndDate[0]);
+
+                createTask(task);
             } else {
-                AlertDialog alertDialog = new AlertDialog.Builder(this).setMessage("Please set time and date by syntax:\n" +
-                                "hour {your_hour} minute {your_minute} day {your_day} month {your_month} year {your_year}")
-                        .setTitle("We need time and date for your ToDo!")
-                        .setNeutralButton("Got it!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).create();
-                alertDialog.show();
+                showIncorrectFormNotification();
             }
         }
     }
@@ -181,6 +217,12 @@ public class MainActivity extends BaseActivity
     private void handleVisibilityChildButtons(Boolean visibility) {
         buttonVoice.setVisibility(visibility ? View.VISIBLE : View.GONE);
         buttonKeyBoard.setVisibility(visibility ? View.VISIBLE : View.GONE);
+
+        if (isButtonOpening) {
+            buttonAdd.setRotation(45f);
+        } else {
+            buttonAdd.setRotation(0f);
+        }
     }
 
     public void setUpAdapter() {
@@ -195,11 +237,7 @@ public class MainActivity extends BaseActivity
         class GetSavedTasks extends AsyncTask<Void, Void, List<Task>> {
             @Override
             protected List<Task> doInBackground(Void... voids) {
-                tasks = DatabaseClient
-                        .getInstance(getApplicationContext())
-                        .getAppDatabase()
-                        .dataBaseAction()
-                        .getAllTasksList();
+                tasks = DatabaseClient.getInstance(getApplicationContext()).getAppDatabase().dataBaseAction().getAllTasksList();
                 return tasks;
             }
 
@@ -225,9 +263,7 @@ public class MainActivity extends BaseActivity
             @SuppressLint("WrongThread")
             @Override
             protected Void doInBackground(Void... voids) {
-                DatabaseClient.getInstance(MainActivity.this).getAppDatabase()
-                        .dataBaseAction()
-                        .insertDataIntoTaskList(task);
+                DatabaseClient.getInstance(MainActivity.this).getAppDatabase().dataBaseAction().insertDataIntoTaskList(task);
                 return null;
             }
 
