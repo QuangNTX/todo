@@ -87,11 +87,13 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.25">
 
-            <!--            TODO-->
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/noDataGif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:lottie_rawRes="@raw/add_document_gif"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
                 android:layout_gravity="center" />
 
             <TextView

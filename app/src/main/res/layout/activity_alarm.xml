@@ -8,13 +8,15 @@
     android:orientation="vertical"
     tools:context=".activity.AlarmActivity">
 
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_gravity="center"
         android:layout_marginTop="80dp"
-        android:src="@drawable/alert" />
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/bell_notification_gif" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
